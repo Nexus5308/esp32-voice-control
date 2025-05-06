@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ESP32 Voice Control</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 40px; }
+    button { padding: 15px 25px; margin: 10px; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <h2>ESP32 Robot Control</h2>
+  <button onclick="sendCommand('forward')">Forward</button><br>
+  <button onclick="sendCommand('left')">Left</button>
+  <button onclick="sendCommand('stop')">Stop</button>
+  <button onclick="sendCommand('right')">Right</button><br>
+  <button onclick="sendCommand('backward')">Backward</button><br><br>
+  
+  <button onclick="startVoice()">🎤 Voice Command</button>
+  <p id="status">Say: forward, backward, left, right, stop</p>
+
+  <script>
+    const espIP = "http://192.168.4.1";
+
+    function sendCommand(cmd) {
+      fetch(`${espIP}/move?dir=${cmd}`)
+        .then(() => document.getElementById("status").innerText = "Command: " + cmd)
+        .catch(() => alert("Failed to send command. Is ESP32 connected?"));
+    }
+
+    function startVoice() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("Voice recognition not supported in this browser.");
+        return;
+      }
+
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.start();
+
+      recognition.onresult = function(event) {
+        const command = event.results[0][0].transcript.toLowerCase();
+        document.getElementById("status").innerText = "Heard: " + command;
+
+        if (["forward", "backward", "left", "right", "stop"].includes(command)) {
+          sendCommand(command);
+        } else {
+          document.getElementById("status").innerText = "Unrecognized command: " + command;
+        }
+      };
+
+      recognition.onerror = function(event) {
+        alert("Error: " + event.error);
+      };
+    }
+  </script>
+</body>
+</html>
