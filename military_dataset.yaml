@@ -1,4 +1,4 @@
-path: /kaggle/military_object_dataset
+path: /kaggle/working/military_object_dataset
 test: test/images
 train: train/images
 val: val/images
@@ -15,4 +15,5 @@ names:
   8: military_artillery
   9: trench
   10: military_aircraft
+
   11: military_warship
